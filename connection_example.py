@@ -3,7 +3,7 @@
 Find the instruments in your environment with the defined VISA implementation
 """
 
-from RsInstrument import *
+import RsInstrument
 
 # In the optional parameter visa_select you can use e.g.: 'rs' or 'ni'
 # Rs Visa also finds any NRP-Zxx USB sensors
@@ -17,7 +17,7 @@ Preconditions:
     - Installed VISA e.g. R&S Visa 5.12 or newer
 """
 
-from RsInstrument import *
+
 
 # A good practice is to assure that you have a certain minimum version installed
 RsInstrument.assert_minimum_version('1.50.0')
@@ -42,7 +42,7 @@ instr.close()
 Basic string write_str / query_str
 """
 
-from RsInstrument import *
+
 
 # A good practice is to assure that you have a certain minimum version installed
 RsInstrument.assert_minimum_version('1.50.0')
@@ -61,7 +61,7 @@ instr.close()
 Basic string write_str / query_str
 """
 
-from RsInstrument import *
+
 
 # A good practice is to assure that you have a certain minimum version installed
 RsInstrument.assert_minimum_version('1.50.0')
@@ -82,7 +82,7 @@ instr.close()
 Basic string write_xxx / query_xxx
 """
 
-from RsInstrument import *
+
 
 # A good practice is to assure that you have a certain minimum version installed
 RsInstrument.assert_minimum_version('1.50.0')

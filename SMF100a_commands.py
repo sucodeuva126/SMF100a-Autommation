@@ -3,17 +3,17 @@ import pyvisa
 class Instrument:
     def __init__(self):
         pass
-    def connect(self, ip):
+    def connect(self, ip, timeout):
         try:
-            ip = "192.168.0.2"
             rm = pyvisa.ResourceManager()
             rm.list_resources()
             self.smf = rm.open_resource('TCPIP::'+ip+'::inst0::INSTR')
-            self.smf.timeuout = 5000
+            self.smf.timeuout = timeout
             answer = self.smf.query('*IDN?')
             print(answer)
             self.connected = "Rohde&Schwarz" in answer
         except:
+            print("Connection Failed")
             self.connected = False
 
     def config_Modulation(self, **kwargs):
@@ -49,7 +49,7 @@ class Instrument:
             if "freq_offset" in kwargs: self.smf.write('SOURce:FREQuency:OFFSet' + str(kwargs["freq_offset"]))
             if "reset_phase_ref" in kwargs: self.smf.write('SOURce:PHASe;:REFerence ' + str(kwargs["reset_phase_ref"]))
             if "phase" in kwargs: self.smf.write('SOURce:PHASe ' + str(kwargs["phase"]))
-            if "output_state" in kwargs: self.smf.write(':OUTPut<hw>[:STATe] ' + str(kwargs["output_state"]))
+            if "output_state" in kwargs: self.smf.write('OUTPut:STATe ' + str(kwargs["output_state"]))
         return None
     
     def config_RF_Level(self, **kwargs):
@@ -63,3 +63,104 @@ class Instrument:
             if "attenuator_mode" in kwargs:self.smf.write("OUTPut:AMODe " + str(kwargs["attenuator_mode"]))
             if "output_state" in kwargs:self.smf.write("OUTPut:STATe " + str(kwargs["output_state"]))
         return None
+    
+    def config_Pulse_Train(self, **kwargs):
+        if self.connected:
+
+            # Define o diretório padrão de listas
+            if "directory" in kwargs:
+                self.smf.write(
+                    "MMEMory:CDIRectory " + str(kwargs["directory"])
+                )
+
+            # --- MÉTODOS DE DEFINIÇÃO DIRETA (Sem arquivo CSV) ---
+            if "train_file" in kwargs:
+                self.smf.write(
+                    "SOURce:PULM:TRAin:SELect "
+                    + f"'{str(kwargs['train_file'])}'"
+                )
+
+            if "on_times" in kwargs:
+                self.smf.write(
+                    "SOURce:PULM:TRAin:ONTime "
+                    + str(kwargs["on_times"])
+                )
+
+            if "off_times" in kwargs:
+                self.smf.write(
+                    "SOURce:PULM:TRAin:OFFTime "
+                    + str(kwargs["off_times"])
+                )
+
+            if "repetitions" in kwargs:
+                self.smf.write(
+                    "SOURce:PULM:TRAin:REPetition "
+                    + str(kwargs["repetitions"])
+                )
+
+            # --- MÉTODOS DE IMPORTAÇÃO DE ARQUIVO ASCII/CSV (DEXChange) ---
+            if "import_ascii_file" in kwargs:
+                self.smf.write(
+                    "SOURce:PULM:TRAin:DEXChange:MODE IMPort"
+                )
+
+            if "ascii_ext" in kwargs:
+                self.smf.write(
+                    "SOURce:PULM:TRAin:DEXChange:AFILe:EXTension "
+                    + str(kwargs["ascii_ext"])
+                )
+
+            if "col_separator" in kwargs:
+                self.smf.write(
+                    "SOURce:PULM:TRAin:DEXChange:AFILe:SEParator:COLumn "
+                    + str(kwargs["col_separator"])
+                )
+
+                self.smf.write(
+                    "SOURce:PULM:TRAin:DEXChange:AFILe:SELect "
+                    + f"'{str(kwargs['import_ascii_file'])}'"
+                )
+
+            if "target_train_file" in kwargs:
+                self.smf.write(
+                    "SOURce:PULM:TRAin:DEXChange:SELect "
+                    + f"'{str(kwargs['target_train_file'])}'"
+                )
+
+                self.smf.write(
+                    "SOURce:PULM:TRAin:DEXChange:EXECute"
+                )
+
+            # --- ESTADO E MODO DE MODULAÇÃO ---
+            if "pulse_source" in kwargs:
+                self.smf.write(
+                    "SOURce:PULM:SOURce "
+                    + str(kwargs["pulse_source"])
+                )  # ex: INTernal ou EXTernal
+
+            if "pulse_mode" in kwargs:
+                self.smf.write(
+                    "SOURce:PULM:MODE "
+                    + str(kwargs["pulse_mode"])
+                )  # ex: PTRain, SINGle ou DOUBle
+
+            if "pulm_state" in kwargs:
+                self.smf.write(
+                    "SOURce:PULM:STATe "
+                    + str(kwargs["pulm_state"])
+            )
+
+            return None
+
+
+
+SMF = Instrument()
+SMF.connect("192.168.0.2", 5000)
+SMF.config_RF_Frequency(freq = 200000000, output_state = 1)
+# Importa o arquivo CSV de pulsos e ativa a modulação no gerador
+# 1. Envia o arquivo do PC para o gerador
+pc_path = "/home/gustavohenrique/SMF100A_control/pulso_quadrado.csv"                       # Arquivo no seu computador
+remote_path = "/var/user/Lists/pulso_quadrado.csv"  # Destino no gerador
+
+
+
