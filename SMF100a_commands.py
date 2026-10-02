@@ -37,8 +37,7 @@ class Instrument:
             if "pm_source" in kwargs:self.smf.write("SOURce:PM:SOURce " + str(kwargs["pm_source"]))
 
             # Modulação por Pulso (PULM)
-            if "pulm_state" in kwargs:
-                self.smf.write("SOURce:PULM:STATe " + str(kwargs["pulm_state"]))
+            if "pulm_state" in kwargs:self.smf.write("SOURce:PULM:STATe " + str(kwargs["pulm_state"]))
             if "pulm_width" in kwargs:self.smf.write("SOURce:PULM:WIDTh " + str(kwargs["pulm_width"]))
             if "pulm_period" in kwargs:self.smf.write("SOURce:PULM:PERiod " + str(kwargs["pulm_period"]))
             if "pulm_source" in kwargs:self.smf.write("SOURce:PULM:SOURce " + str(kwargs["pulm_source"]))
