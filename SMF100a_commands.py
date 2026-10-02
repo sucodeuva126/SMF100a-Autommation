@@ -26,11 +26,13 @@ class Instrument:
     def config_Modulation(self):
         return None
 
-    def config_RF_Frequency(self, freq, phase, output_state):
+    def config_RF_Frequency(self, **kwargs):
         if self.connected:
-            self.smf.write('SOURce:FREQuency:CW ' + str(freq))
-            self.smf.write('SOURce:PHASe ' + str(phase))
-            self.smf.write(':OUTPut<hw>[:STATe] ' + str(output_state))
+            if "freq" in kwargs: self.smf.write('SOURce:FREQuency:CW ' + str(kwargs["freq"]))
+            if "freq_offset" in kwargs: self.smf.write('SOURce:FREQuency:OFFSet' + str(kwargs["freq_offset"]))
+            if "reset_phase_ref" in kwargs: self.smf.write('SOURce:PHASe;:REFerence ' + str(kwargs["reset_phase_ref"]))
+            if "phase" in kwargs: self.smf.write('SOURce:PHASe ' + str(kwargs["phase"]))
+            if "output_state" in kwargs: self.smf.write(':OUTPut<hw>[:STATe] ' + str(kwargs["output_state"]))
         return None
     def config_Level_Control(self):
         return None
