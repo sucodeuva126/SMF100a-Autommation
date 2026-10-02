@@ -16,14 +16,32 @@ class Instrument:
         except:
             self.connected = False
 
-            
-    def config_Pulse_Mod_Gen(self, value):
+    def config_Modulation(self, **kwargs):
         if self.connected:
-            self.smf.write('[:SOURce<hw>]:PGENerator:OUTPut[:STATe] ' + str(value))
-        else:
-            return None
+            # Estado Global
+            if "mod_state" in kwargs:self.smf.write("SOURce:MODulation:STATe " + str(kwargs["mod_state"]))
 
-    def config_Modulation(self):
+            # AM
+            if "am_state" in kwargs:self.smf.write("SOURce:AM:STATe " + str(kwargs["am_state"]))
+            if "am_depth" in kwargs:self.smf.write("SOURce:AM:DEPTh " + str(kwargs["am_depth"]))
+            if "am_source" in kwargs:self.smf.write("SOURce:AM:SOURce " + str(kwargs["am_source"]))
+
+            # FM
+            if "fm_state" in kwargs:self.smf.write("SOURce:FM:STATe " + str(kwargs["fm_state"]))
+            if "fm_dev" in kwargs:self.smf.write("SOURce:FM:DEViation " + str(kwargs["fm_dev"]))
+            if "fm_source" in kwargs:self.smf.write("SOURce:FM:SOURce " + str(kwargs["fm_source"]))
+
+            # PM
+            if "pm_state" in kwargs:self.smf.write("SOURce:PM:STATe " + str(kwargs["pm_state"]))
+            if "pm_dev" in kwargs:self.smf.write("SOURce:PM:DEViation " + str(kwargs["pm_dev"]))
+            if "pm_source" in kwargs:self.smf.write("SOURce:PM:SOURce " + str(kwargs["pm_source"]))
+
+            # Modulação por Pulso (PULM)
+            if "pulm_state" in kwargs:
+                self.smf.write("SOURce:PULM:STATe " + str(kwargs["pulm_state"]))
+            if "pulm_width" in kwargs:self.smf.write("SOURce:PULM:WIDTh " + str(kwargs["pulm_width"]))
+            if "pulm_period" in kwargs:self.smf.write("SOURce:PULM:PERiod " + str(kwargs["pulm_period"]))
+            if "pulm_source" in kwargs:self.smf.write("SOURce:PULM:SOURce " + str(kwargs["pulm_source"]))
         return None
 
     def config_RF_Frequency(self, **kwargs):
@@ -34,5 +52,15 @@ class Instrument:
             if "phase" in kwargs: self.smf.write('SOURce:PHASe ' + str(kwargs["phase"]))
             if "output_state" in kwargs: self.smf.write(':OUTPut<hw>[:STATe] ' + str(kwargs["output_state"]))
         return None
-    def config_Level_Control(self):
+    
+    def config_RF_Level(self, **kwargs):
+        if self.connected:
+            if "level" in kwargs: self.smf.write("SOURce:POWer:AMPLitude " + str(kwargs["level"]))
+            if "level_offset" in kwargs:self.smf.write("SOURce:POWer:OFFSet " + str(kwargs["level_offset"]))
+            if "level_limit" in kwargs:self.smf.write("SOURce:POWer:LIMit:AMPLitude " + str(kwargs["level_limit"]))
+            if "level_mode" in kwargs:self.smf.write("SOURce:POWer:MODE " + str(kwargs["level_mode"]))
+            if "alc_state" in kwargs:self.smf.write("SOURce:POWer:ALC:STATe " + str(kwargs["alc_state"]))
+            if "alc_sonce" in kwargs:self.smf.write("SOURce:POWer:ALC:SONCe")
+            if "attenuator_mode" in kwargs:self.smf.write("OUTPut:AMODe " + str(kwargs["attenuator_mode"]))
+            if "output_state" in kwargs:self.smf.write("OUTPut:STATe " + str(kwargs["output_state"]))
         return None
